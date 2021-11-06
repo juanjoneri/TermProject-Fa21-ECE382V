@@ -4,7 +4,6 @@ from scipy.spatial import ConvexHull
 
 import os
 import networkx as nx
-import numpy as np
 
 def _build_graph(nodes, edges=[]):
     '''
@@ -47,12 +46,12 @@ def _save_data(coordinates, edges, output_file):
     os.makedirs(output_file, exist_ok=True)
 
     input = open(f'{output_file}/input.csv', 'w')
-    for label, coordinate in coordinates.items():
-        input.write(f'{label}, {coordinate}\n')
+    for x, y in coordinates.values():
+        input.write(f'{x}, {y}\n')
     input.close()
 
     output = open(f'{output_file}/solution.txt', 'w')
-    output.write(', '.join(map(str, edges)))
+    output.write(','.join(map(str, edges)))
     output.close()
 
 def _save_dataset(G, coordinates, edges, output_file):
@@ -60,8 +59,16 @@ def _save_dataset(G, coordinates, edges, output_file):
     _plot_graph(G, coordinates, output_file)
 
 if __name__ == '__main__':
-    G, coordinates, edges = _init_blobs(20, [(0,0), (1,1)], 0.2)
-    _save_dataset(G, coordinates, edges, 'blobs')
 
-    G, coordinates, edges = _init_halfmoons(20, 0.1)
-    _save_dataset(G, coordinates, edges, 'moons')
+    for size in (10, 100, 1000, 5000, 10000):
+        # Cluster
+        G, coordinates, edges = _init_blobs(size, [(5,5)], 0.2)
+        _save_dataset(G, coordinates, edges, f'cluster-{size}')
+
+        # Blob
+        G, coordinates, edges = _init_blobs(size, [(0,0), (1,1)], 0.3)
+        _save_dataset(G, coordinates, edges, f'blobs-{size}')
+
+        # Moon
+        G, coordinates, edges = _init_halfmoons(size, 0.1)
+        _save_dataset(G, coordinates, edges, f'moons-{size}')
