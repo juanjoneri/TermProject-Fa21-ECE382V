@@ -1,4 +1,5 @@
 from itertools import combinations
+from collections import deque
 from datasets.dataset_reader import Dataset
 from algorithm import Algorithm
 
@@ -13,13 +14,19 @@ class Naive(Algorithm):
     '''
 
     def _compute(self):
-        hull = set()
+        hull = {}
         for edge in combinations(self._vertices, 2):
             if self._is_in_hull(edge):
-                a, b = edge
-                hull.add((self._get_index(a), self._get_index(b)))
+                self._add_to_hull(hull, edge)
         
-        return hull
+        return Algorithm._to_deque(hull)
+    
+    def _add_to_hull(self, hull, edge):
+        a, b = tuple(map(self._get_index, edge))
+        if a not in hull:
+            hull[a] = b
+        else:
+            hull[b] = a
 
     def _is_in_hull(self, edge):
         '''
@@ -41,6 +48,7 @@ class Naive(Algorithm):
                 return False
         
         return True
+
 
 if __name__ == '__main__':
     dataset = Dataset(sys.argv[1])

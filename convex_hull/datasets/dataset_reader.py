@@ -1,16 +1,25 @@
 import pandas as pd
 
 from functools import cached_property
+from collections import deque
 
 class Dataset():
 
     def __init__(self, dataset):
         self._dataset = dataset
 
-    def check_solution(self, edges):
-        actual = {tuple(sorted(edge)) for edge in edges}
-        expected = {tuple(sorted(edge)) for edge in self.solution}
-        assert(actual == expected)
+    def check_solution(self, hull):
+        if len(hull) != len(self.solution):
+            return False
+        
+        start = self.solution[0]
+        if not start in hull:
+            return False
+
+        while start != hull[0]:
+            hull.rotate()
+        
+        return (self.solution == hull)
 
     @cached_property
     def data(self):
@@ -20,13 +29,9 @@ class Dataset():
     
     @cached_property
     def solution(self):
-        solution = []
         with open(f'{self._dataset}/solution.txt') as f:
-            solution_nodes = list(map(int, f.read().split(',')))
-            for edge in zip(solution_nodes, solution_nodes[1:]):
-                solution.append(edge)
-            solution.append((solution_nodes[-1], solution_nodes[0]))
-        return solution
+            sol = deque(map(int, f.read().split(',')))
+        return sol
 
 
 if __name__ == '__main__':
