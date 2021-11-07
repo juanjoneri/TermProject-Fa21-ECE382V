@@ -1,24 +1,27 @@
 import pandas as pd
 
-class DatasetReader():
+from functools import cached_property
+
+class Dataset():
 
     def __init__(self, dataset):
-        self.data = DatasetReader._read_data(dataset)
-        self.solution = DatasetReader._read_solution(dataset)
+        self._dataset = dataset
 
     def check_solution(self, edges):
         actual = {tuple(sorted(edge)) for edge in edges}
         expected = {tuple(sorted(edge)) for edge in self.solution}
         assert(actual == expected)
 
-    def _read_data(dataset):
-        df = pd.read_csv(f'{dataset}/input.csv', header=None)
+    @cached_property
+    def data(self):
+        df = pd.read_csv(f'{self._dataset}/input.csv', header=None)
         data = list(df.itertuples(index=False, name=None))
         return data
     
-    def _read_solution(dataset):
+    @cached_property
+    def solution(self):
         solution = []
-        with open(f'{dataset}/solution.txt') as f:
+        with open(f'{self._dataset}/solution.txt') as f:
             solution_nodes = list(map(int, f.read().split(',')))
             for edge in zip(solution_nodes, solution_nodes[1:]):
                 solution.append(edge)
@@ -27,7 +30,7 @@ class DatasetReader():
 
 
 if __name__ == '__main__':
-    dataset_reader = DatasetReader('blobs-10')
-    d = dataset_reader.data
-    s = dataset_reader.solution
+    dataset = Dataset('blobs-10')
+    d = dataset.data
+    s = dataset.solution
     print(d, s)
