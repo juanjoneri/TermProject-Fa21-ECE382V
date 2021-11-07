@@ -9,17 +9,21 @@ class Dataset():
         self._dataset = dataset
 
     def check_solution(self, hull):
-        if len(hull) != len(self.solution):
-            return False
-        
-        start = self.solution[0]
-        if not start in hull:
+        head = self.solution[0]
+
+        if (len(hull) != len(self.solution)) or (head not in hull):
             return False
 
-        while start != hull[0]:
+        while hull[0] != head:
             hull.rotate()
         
-        return (self.solution == hull)
+        if (self.solution == hull):
+            return True
+        
+        # Its possible the solutions was reversed
+        hull.reverse()
+        hull.rotate()
+        return self.solution == hull
 
     @cached_property
     def data(self):

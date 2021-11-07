@@ -54,5 +54,5 @@ if __name__ == '__main__':
     dataset = Dataset(sys.argv[1])
     algo = Naive(dataset.data)
     solution = algo.compute()
-    dataset.check_solution(solution)
-    print(f'Runtime: {algo.runtime}ms')
+    check = dataset.check_solution(solution)
+    print(f'Check: {check} \nSolution: {solution}, \nRuntime: {algo.runtime}ms')

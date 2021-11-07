@@ -1,4 +1,5 @@
 from algorithm import Algorithm
+from collections import deque
 
 class DivideAndConquer(Algorithm):
     '''
@@ -12,18 +13,30 @@ class DivideAndConquer(Algorithm):
         return self._compute_subproblem(0, len(self._vertices))
     
     def _compute_subproblem(self, start, end):
-        def index_at(i):
-            return self._get_index(self._vertices[i])
-
         if (end - start) == 2:
-            # Only two vertices in this subproblem
-            return [(index_at(start), index_at(end-1))]
+            a, b = self._vertices[start], self._vertices[start + 1]
+            return deque([self._get_index(a), self._get_index(b)])
+
         if (end - start) == 3:
-            pass
+            a = self._vertices[start]
+            b, c = self._sort(self._vertices[start + 1], self._vertices[start + 2])
+            return deque([self._get_index(a), self._get_index(b), self._get_index(c)])
+        
+        mid = start + ((end - start) // 2)
+        return self._merge(self._compute_subproblem(start, mid), self._compute_subproblem(mid, end))
 
 
+    def _sort(self, a, b):
+        '''
+        Returns a and b in decreasing order of y and increasing order of x
+        '''
+        vertices = [a, b]
+        vertices.sort(key=lambda x: (-x[1], x[0]))
+        return tuple(vertices)
 
-    def _merge(self, left, right):
+
+    @classmethod
+    def _merge(cls, left, right):
         pass
 
 
