@@ -2,30 +2,24 @@ from itertools import combinations
 from datasets.dataset_reader import Dataset
 from algorithm import Algorithm
 
+import sys 
 import numpy as np
 
-class NaiveAlgorithm(Algorithm):
+class Naive(Algorithm):
     '''
-    For each pair of points (i,j) in the dataset, check if the edge (i,j) is in the hull by
+    For each pair of vertices (i,j) in the dataset, check if the edge (i,j) is in the hull by
     checking that all other vertices are on the same half-plane delimited by the given edge.
     order = O(n^3)
     '''
 
-    def __init__(self, vertices):
-        self.vertices = vertices
-        self._indices = {v: i  for i, v in enumerate(self.vertices)}
-
     def _compute(self):
         hull = set()
-        for edge in combinations(self.vertices, 2):
+        for edge in combinations(self._vertices, 2):
             if self._is_in_hull(edge):
                 a, b = edge
                 hull.add((self._get_index(a), self._get_index(b)))
         
         return hull
-
-    def _get_index(self, vertex):
-        return self._indices[vertex]
 
     def _is_in_hull(self, edge):
         '''
@@ -35,7 +29,7 @@ class NaiveAlgorithm(Algorithm):
         a, b = edge
         v = np.subtract(b, a)
         sign = None
-        for c in self.vertices:
+        for c in self._vertices:
             w = np.subtract(c, a)
             cross = np.cross(v, w)
             current_sign = (cross > 0)
@@ -49,8 +43,8 @@ class NaiveAlgorithm(Algorithm):
         return True
 
 if __name__ == '__main__':
-    dataset = Dataset('datasets/blobs-10')
-    algo = NaiveAlgorithm(dataset.data)
+    dataset = Dataset(sys.argv[1])
+    algo = Naive(dataset.data)
     solution = algo.compute()
     dataset.check_solution(solution)
-    print(algo.runtime)
+    print(f'Runtime: {algo.runtime}ms')
