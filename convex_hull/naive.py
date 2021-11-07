@@ -1,5 +1,4 @@
 from itertools import combinations
-from collections import deque
 from datasets.dataset_reader import Dataset
 from algorithm import Algorithm
 
