@@ -1,6 +1,6 @@
 from algorithm import Algorithm
 from collections import deque
-from itertools import product
+from itertools import product, islice, cycle
 from datasets.dataset_reader import Dataset
 
 import sys
@@ -8,9 +8,8 @@ import sys
 class DivideAndConquer(Algorithm):
     '''
     Divide each dataset into two datasets of equal size (using the median of the x coordinates) until
-    sub-problem has size < 3 and can be solved trivially. Merge back the datasets using the naive upper and 
+    sub-problem has size == 1 and can be solved trivially. Merge back the datasets using the naive upper and 
     lower tangent algorithm
-    order = O(n*log(n))
     '''
 
     def _compute(self):
@@ -19,42 +18,30 @@ class DivideAndConquer(Algorithm):
         
     
     def _compute_subproblem(self, start, end):
-        if (end - start) == 2:
-            a, b = self._vertices[start], self._vertices[start + 1]
-            return deque([a, b])
-
-        if (end - start) == 3:
+        if (end - start) == 1:
             a = self._vertices[start]
-            b, c = self._sort(self._vertices[start + 1], self._vertices[start + 2])
-            return deque([a, b, c])
+            return deque([a])
         
         mid = start + ((end - start) // 2)
-        print(f'Iterating on {start}, {mid}, {end}')
         return self._merge(self._compute_subproblem(start, mid), self._compute_subproblem(mid, end))
 
     @classmethod
-    def _sort(cls, a, b):
-        '''
-        Returns a and b in decreasing order of y and increasing order of x
-        '''
-        vertices = [a, b]
-        vertices.sort(key=lambda x: (-x[1], x[0]))
-        return tuple(vertices)
-
-
-    @classmethod
-    def _merge(cls, left, right):
+    def _merge(self, left, right):
         lower_tangent, upper_tangent = DivideAndConquer._get_lower_and_upper_tangents(left, right)
         hull = deque()
         for vertex in left:
             hull.append(vertex)
             if vertex == upper_tangent[0]:
                 break
-        for vertex in list(right)[right.index(upper_tangent[1]):]:
+        
+        for vertex in islice(cycle(right), right.index(upper_tangent[1]), None):
             hull.append(vertex)
             if vertex == lower_tangent[1]:
                 break
-        for vertex in list(left)[left.index(lower_tangent[0]):]:
+        
+        for vertex in islice(cycle(left), left.index(lower_tangent[0]), None):
+            if vertex == left[0]:
+                break
             hull.append(vertex)
         return hull
 
