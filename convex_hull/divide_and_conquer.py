@@ -9,7 +9,8 @@ class DivideAndConquer(Algorithm):
     '''
     Divide each dataset into two datasets of equal size (using the median of the x coordinates) until
     sub-problem has size == 1 and can be solved trivially. Merge back the datasets using the naive upper and 
-    lower tangent algorithm
+    lower tangent algorithm (listing all n^2/4 combinations of vertices between the left and right sides)
+    complexity:  T(n) = 2 * T(n/2) + n^2 => O(n^2)
     '''
 
     def _compute(self):
@@ -25,9 +26,8 @@ class DivideAndConquer(Algorithm):
         mid = start + ((end - start) // 2)
         return self._merge(self._compute_subproblem(start, mid), self._compute_subproblem(mid, end))
 
-    @classmethod
     def _merge(self, left, right):
-        lower_tangent, upper_tangent = DivideAndConquer._get_lower_and_upper_tangents(left, right)
+        lower_tangent, upper_tangent = self._get_lower_and_upper_tangents(left, right)
         hull = deque()
         for vertex in left:
             hull.append(vertex)
@@ -46,8 +46,7 @@ class DivideAndConquer(Algorithm):
         return hull
 
 
-    @classmethod
-    def _get_lower_and_upper_tangents(cls, left, right):
+    def _get_lower_and_upper_tangents(self, left, right):
         x = (max([v[0] for v in left]) + min([v[0] for v in right])) / 2
         lower_tangent = float('inf'), None
         upper_tangent = float('-inf'), None

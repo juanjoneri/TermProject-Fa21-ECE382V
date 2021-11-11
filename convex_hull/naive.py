@@ -9,7 +9,7 @@ class Naive(Algorithm):
     '''
     For each pair of vertices (i,j) in the dataset, check if the edge (i,j) is in the hull by
     checking that all other vertices are on the same half-plane delimited by the given edge.
-    order = O(n^3)
+    complexity: O(n^3)
     '''
 
     def _compute(self):
