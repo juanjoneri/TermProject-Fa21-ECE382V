@@ -13,7 +13,6 @@ class QuickHull(Algorithm):
         hull = nx.Graph()
         self._quickhull(edge, up, hull)
         self._quickhull(edge, down, hull)
-        print(hull.edges)
         return QuickHull._to_deque(hull)
 
 
