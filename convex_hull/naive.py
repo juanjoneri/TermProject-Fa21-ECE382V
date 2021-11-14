@@ -19,13 +19,6 @@ class Naive(Algorithm):
                 self._add_to_hull(hull, edge)
         
         return Algorithm._to_deque(hull)
-    
-    def _add_to_hull(self, hull, edge):
-        a, b = tuple(map(self._get_index, edge))
-        if a not in hull:
-            hull[a] = b
-        else:
-            hull[b] = a
 
     def _is_in_hull(self, edge):
         '''

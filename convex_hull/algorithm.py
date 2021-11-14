@@ -9,8 +9,8 @@ import time
 class Algorithm(ABC):
 
     def __init__(self, vertices):
-        self._vertices = sorted(vertices)
-        self._index_to_vertex = bidict(enumerate(vertices))
+        self._vertices = sorted(vertices) # [(x1, y1), (x2, y2), ...]
+        self._index_to_vertex = bidict(enumerate(vertices)) # (x1, y1) <-> 1
 
     def compute(self):
         '''
@@ -37,6 +37,14 @@ class Algorithm(ABC):
 
     def _get_vertex(self, index):
         return self._index_to_vertex[index]
+
+    def _add_to_hull(self, hull, edge):
+        a, b = tuple(map(self._get_index, edge))
+        if a not in hull:
+            hull[a] = b
+        else:
+            hull[b] = a
+        return hull
 
     @classmethod
     def _to_deque(cls, hull):
