@@ -1,5 +1,6 @@
 from algorithm import Algorithm
 from datasets.dataset_reader import Dataset
+import networkx as nx
 
 import sys 
 
@@ -9,24 +10,21 @@ class QuickHull(Algorithm):
         edge = (self._vertices[0], self._vertices[-1])
         up = QuickHull._divide_vertices(edge, self._vertices, 1)
         down = QuickHull._divide_vertices(edge, self._vertices, -1)
-        hull = {}
+        hull = nx.Graph()
         self._quickhull(edge, up, hull)
         self._quickhull(edge, down, hull)
-        print(hull)
+        print(hull.edges)
         return QuickHull._to_deque(hull)
 
 
-    def _quickhull(self, edge, vertices, hull=None):
-        if hull is None:
-            hull = {}
-            
+    def _quickhull(self, edge, vertices, hull):
         if not any(vertices):
             return self._add_to_hull(hull, edge)
         
         furthest = QuickHull._find_futhest(edge, vertices)
         edge1 = furthest, edge[0]
-        sign1 = -QuickHull._sign(QuickHull._distance(edge1, edge[1]))
         edge2 = furthest, edge[1]
+        sign1 = -QuickHull._sign(QuickHull._distance(edge1, edge[1]))
         sign2 = -QuickHull._sign(QuickHull._distance(edge2, edge[0]))
 
         self._quickhull(edge1, QuickHull._divide_vertices(edge1, vertices, sign1), hull)

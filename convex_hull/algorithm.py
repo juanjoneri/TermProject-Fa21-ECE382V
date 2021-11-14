@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from bidict import bidict
 from collections import deque
 from math import ceil
+import networkx as nx
 
 import time
 
@@ -40,20 +41,19 @@ class Algorithm(ABC):
 
     def _add_to_hull(self, hull, edge):
         a, b = tuple(map(self._get_index, edge))
-        if a not in hull:
-            hull[a] = b
-        else:
-            hull[b] = a
-        return hull
+        hull.add_edge(a, b)
 
     @classmethod
     def _to_deque(cls, hull):
         d = deque()
+        visited = set()
         d.append(next(iter(hull)))
         while(True):
             source = d[-1]
-            target = hull[source]
-            if target == d[0]:
+            visited.add(source)
+            targets = set(nx.neighbors(hull, source)) - visited
+            if len(targets) == 0:
                 break
+            target = next(iter(targets))
             d.append(target)
         return d

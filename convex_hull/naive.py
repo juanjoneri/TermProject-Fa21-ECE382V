@@ -1,9 +1,10 @@
 from itertools import combinations
 from datasets.dataset_reader import Dataset
 from algorithm import Algorithm
+import networkx as nx
+import numpy as np
 
 import sys 
-import numpy as np
 
 class Naive(Algorithm):
     '''
@@ -13,7 +14,7 @@ class Naive(Algorithm):
     '''
 
     def _compute(self):
-        hull = {}
+        hull = nx.Graph()
         for edge in combinations(self._vertices, 2):
             if self._is_in_hull(edge):
                 self._add_to_hull(hull, edge)
