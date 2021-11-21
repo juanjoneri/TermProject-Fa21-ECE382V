@@ -9,9 +9,10 @@ import time
 
 class Algorithm(ABC):
 
-    def __init__(self, vertices):
+    def __init__(self, vertices, cores=1):
         self._vertices = sorted(vertices) # [(x1, y1), (x2, y2), ...]
         self._index_to_vertex = bidict(enumerate(vertices)) # (x1, y1) <-> 1
+        self.cores = cores
 
     def compute(self):
         '''
