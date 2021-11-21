@@ -12,14 +12,25 @@ class ParallelizedQuickHull(Algorithm):
         edge = (min(self._vertices), max(self._vertices))
         upper = ParallelizedQuickHull._divide_vertices(edge, self._vertices, 1)
         lower = ParallelizedQuickHull._divide_vertices(edge, self._vertices, -1)
-        hull1 = hull2 = nx.Graph()
-        self._quickhull(edge, upper, hull1)
-        self._quickhull(edge, lower, hull2)
+
+        if self.cores >= 2:
+            hull1, hull2 = nx.Graph(), nx.Graph()
+            t1 = Thread(target=self._quickhull, args=(edge, upper, hull1))
+            t2 = Thread(target=self._quickhull, args=(edge, lower, hull2))
+            t1.start()
+            t2.start()
+            t1.join()
+            t2.join()
+        else:
+            hull1 = hull2 = nx.Graph()
+            self._quickhull(edge, upper, hull1)
+            self._quickhull(edge, lower, hull2)
+        
         hull = nx.compose(hull1, hull2)
         return Algorithm._to_deque(hull)
 
 
-    def _quickhull(self, edge, vertices, hull, depth=1):
+    def _quickhull(self, edge, vertices, hull, depth=2):
         if not any(vertices):
             self._add_to_hull(hull, edge)
             return
@@ -83,7 +94,7 @@ class ParallelizedQuickHull(Algorithm):
 
 if __name__ == '__main__':
     dataset = Dataset(sys.argv[1])
-    algo = ParallelizedQuickHull(dataset.data, cores=1)
+    algo = ParallelizedQuickHull(dataset.data, cores=2)
     solution = algo.compute()
     check = dataset.check_solution(solution)
     print(f'Check: {check} \nSolution: {solution}, \nRuntime: {algo.runtime}ms')
