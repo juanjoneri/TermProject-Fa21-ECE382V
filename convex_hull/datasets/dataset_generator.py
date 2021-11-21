@@ -65,11 +65,11 @@ def _save_data(coordinates, edges, output_file):
 
 def _save_dataset(G, coordinates, edges, output_file):
     _save_data(coordinates, edges, output_file)
-    _plot_graph(G, coordinates, output_file)
+    # _plot_graph(G, coordinates, output_file)
 
 if __name__ == '__main__':
 
-    for size in (10, 100, 1000, 5000, 10000):
+    for size in (1000000, 5000000):
         # Rand
         G, coordinates, edges = _init_rand(size)
         _save_dataset(G, coordinates, edges, f'rand-{size}')
