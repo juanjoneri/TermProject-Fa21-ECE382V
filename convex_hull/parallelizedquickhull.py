@@ -93,8 +93,8 @@ class ParallelizedQuickHull(Algorithm):
         return -1
 
 if __name__ == '__main__':
-    dataset = Dataset(sys.argv[1])
-    algo = ParallelizedQuickHull(dataset.data, cores=1)
+    dataset = Dataset(sys.argv[2])
+    algo = ParallelizedQuickHull(dataset.data, cores=int(sys.argv[1]))
     solution = algo.compute()
     check = dataset.check_solution(solution)
     print(f'Check: {check} \nSolution: {solution}, \nRuntime: {algo.runtime}ms')
