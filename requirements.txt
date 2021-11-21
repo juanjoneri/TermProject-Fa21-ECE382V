@@ -1,8 +1,8 @@
-bidict==0.21.4
-matplotlib==3.4.3
-more-itertools==4.2.0
-networkx==2.6.3
-numpy==1.21.4
-pandas==1.3.4
-scikit-learn==1.0.1
-scipy==1.7.2
+bidict
+matplotlib
+more-itertools
+networkx
+numpy
+pandas
+scikit-learn
+scipy
