@@ -7,12 +7,12 @@ import sys
 class QuickHull(Algorithm):
     
     def _compute(self):
-        edge = (self._vertices[0], self._vertices[-1])
-        up = QuickHull._divide_vertices(edge, self._vertices, 1)
-        down = QuickHull._divide_vertices(edge, self._vertices, -1)
+        edge = (min(self._vertices), max(self._vertices))
+        upper = QuickHull._divide_vertices(edge, self._vertices, 1)
+        lower = QuickHull._divide_vertices(edge, self._vertices, -1)
         hull = nx.Graph()
-        self._quickhull(edge, up, hull)
-        self._quickhull(edge, down, hull)
+        self._quickhull(edge, upper, hull)
+        self._quickhull(edge, lower, hull)
         return Algorithm._to_deque(hull)
 
 
