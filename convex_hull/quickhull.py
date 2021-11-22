@@ -8,44 +8,33 @@ class QuickHull(Algorithm):
     
     def _compute(self):
         edge = (min(self._vertices), max(self._vertices))
-        upper = QuickHull._divide_vertices(edge, self._vertices, 1)
-        lower = QuickHull._divide_vertices(edge, self._vertices, -1)
         hull = nx.Graph()
-        self._quickhull(edge, upper, hull)
-        self._quickhull(edge, lower, hull)
+        self._quickhull(edge, 1, hull) # Upper hull
+        self._quickhull(edge, -1, hull) # Lower hull
         return Algorithm._to_deque(hull)
 
 
-    def _quickhull(self, edge, vertices, hull):
-        if not any(vertices):
+    def _quickhull(self, edge, side, hull):
+        furthest = self._find_futhest(edge, side)
+
+        if furthest is None:
             return self._add_to_hull(hull, edge)
+
+        # Iterate on each side of the triangle
+        for i in (0, 1):
+            new_edge = furthest, edge[i]
+            new_side = -QuickHull._sign(new_edge, edge[i-1])
+            self._quickhull(new_edge, new_side, hull)
         
-        furthest = QuickHull._find_futhest(edge, vertices)
-        edge1 = furthest, edge[0]
-        edge2 = furthest, edge[1]
-        sign1 = -QuickHull._sign(QuickHull._distance(edge1, edge[1]))
-        sign2 = -QuickHull._sign(QuickHull._distance(edge2, edge[0]))
-
-        self._quickhull(edge1, QuickHull._divide_vertices(edge1, vertices, sign1), hull)
-        self._quickhull(edge2, QuickHull._divide_vertices(edge2, vertices, sign2), hull)
-
-        return hull
+    def _find_futhest(self, edge, side):
+        furthest = None, 0
+        for v in self._vertices:
+            if QuickHull._sign(edge, v) == side:
+                distance = abs(QuickHull._distance(edge, v))
+                if distance > furthest[1]:
+                    furthest = v, distance
         
-    @classmethod
-    def _find_futhest(cls, edge, vertices):
-        return max(vertices, key=lambda v: abs(cls._distance(edge, v)))
-
-
-    @classmethod
-    def _divide_vertices(cls, edge, vertices, side):
-        sol = set()
-        for vertex in vertices:
-            distance = cls._distance(edge, vertex)
-            if cls._sign(distance) == side: 
-                sol.add(vertex)
-                
-        return sol
-
+        return furthest[0]
 
     @classmethod
     def _distance(cls, edge, vertex):
@@ -58,7 +47,8 @@ class QuickHull(Algorithm):
         return (x2 - x1) * (y1 - y0) - (x1 - x0) * (y2 - y1)
 
     @classmethod
-    def _sign(cls, x):
+    def _sign(cls, edge, vertex):
+        x = cls._distance(edge, vertex)
         if x == 0:
             return 0
         if x > 0:
