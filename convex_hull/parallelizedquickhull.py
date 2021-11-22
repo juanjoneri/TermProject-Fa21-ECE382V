@@ -13,20 +13,19 @@ class ParallelizedQuickHull(Algorithm):
         upper = ParallelizedQuickHull._divide_vertices(edge, self._vertices, 1)
         lower = ParallelizedQuickHull._divide_vertices(edge, self._vertices, -1)
 
-        q1, q2 = Queue(), Queue()
+        q = Queue()
         if self.cores >= 2:
-            t1 = Process(target=self._quickhull, args=(edge, upper, q1))
-            t2 = Process(target=self._quickhull, args=(edge, lower, q2))
+            t1 = Process(target=self._quickhull, args=(edge, upper, q))
+            t2 = Process(target=self._quickhull, args=(edge, lower, q))
             t1.start()
             t2.start()
             t1.join()
             t2.join()
         else:
-            hull1 = hull2 = nx.Graph()
-            self._quickhull(edge, upper, q1)
-            self._quickhull(edge, lower, q2)
+            self._quickhull(edge, upper, q)
+            self._quickhull(edge, lower, q)
         
-        hull = nx.compose(q1.get(), q2.get())
+        hull = nx.compose(q.get(), q.get())
         return Algorithm._to_deque(hull)
 
 
@@ -45,19 +44,19 @@ class ParallelizedQuickHull(Algorithm):
         vertices1 = ParallelizedQuickHull._divide_vertices(edge1, vertices, sign1)
         vertices2 = ParallelizedQuickHull._divide_vertices(edge2, vertices, sign2)
 
-        q1, q2 = Queue(), Queue()
+        new_q = Queue()
         if (log(self.cores, 2) >= depth):
-            t1 = Process(target=self._quickhull, args=(edge1, vertices1, q1, depth+1))
-            t2 = Process(target=self._quickhull, args=(edge2, vertices2, q2, depth+1))
+            t1 = Process(target=self._quickhull, args=(edge1, vertices1, new_q, depth+1))
+            t2 = Process(target=self._quickhull, args=(edge2, vertices2, new_q, depth+1))
             t1.start()
             t2.start()
             t1.join()
             t2.join()
         else:
-            self._quickhull(edge1, vertices1, q1, depth+1)
-            self._quickhull(edge2, vertices2, q2, depth+1)
+            self._quickhull(edge1, vertices1, new_q, depth+1)
+            self._quickhull(edge2, vertices2, new_q, depth+1)
         
-        hull1, hull2 = q1.get(), q2.get()
+        hull1, hull2 = new_q.get(), new_q.get()
         hull.update(hull1.edges(), hull1.nodes())
         hull.update(hull2.edges(), hull2.nodes())
         q.put(hull)
