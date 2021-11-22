@@ -29,10 +29,10 @@ class ParallelQuickHull(QuickHull):
 
 
     def _quickhull(self, edge, side, q, depth=2):
-        hull = nx.Graph()
         furthest = self._find_futhest(edge, side)
 
         if furthest is None:
+            hull = nx.Graph()
             self._add_to_hull(hull, edge)
             q.put(hull)
             return
@@ -54,9 +54,7 @@ class ParallelQuickHull(QuickHull):
             self._quickhull(edge1, side1, new_q, depth+1)
             self._quickhull(edge2, side2, new_q, depth+1)
         
-        hull1, hull2 = new_q.get(), new_q.get()
-        hull.update(hull1.edges(), hull1.nodes())
-        hull.update(hull2.edges(), hull2.nodes())
+        hull = nx.compose(new_q.get(), new_q.get())
         q.put(hull)
 
 if __name__ == '__main__':
